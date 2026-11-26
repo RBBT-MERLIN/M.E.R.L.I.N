@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>M.E.R.L.I.N. Workspace</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eaf2f8;--panel:#ffffffd9;--ink:#0b2a3c;--mut:#4a6b7e;--acc:#0077b6;--acc2:#e07a00;--line:#0077b655;--glow:#0077b622}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#03070d;--panel:#07141fe0;--ink:#d4f1ff;--mut:#7fa9bf;--acc:#38d6ff;--acc2:#ffb454;--line:#38d6ff55;--glow:#38d6ff22}}
+:root[data-theme="dark"]{--bg:#03070d;--panel:#07141fe0;--ink:#d4f1ff;--mut:#7fa9bf;--acc:#38d6ff;--acc2:#ffb454;--line:#38d6ff55;--glow:#38d6ff22}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;overflow:hidden;
+background-image:radial-gradient(circle at 50% 40%,var(--glow),transparent 60%)}
+header{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.logo{font-weight:700;letter-spacing:.25em;color:var(--acc);display:flex;align-items:center;gap:8px}
+.orb{width:14px;height:14px;border-radius:50%;border:2px solid var(--acc);box-shadow:0 0 10px var(--acc),inset 0 0 6px var(--acc);animation:pulse 2.4s infinite}
+@keyframes pulse{50%{transform:scale(.8);opacity:.6}}
+.sp{flex:1}
+button{font:inherit;color:var(--acc);background:transparent;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+button:hover{background:var(--glow);border-color:var(--acc)}
+select{font:inherit;color:var(--acc);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 6px;max-width:150px}
+#clock{color:var(--mut);font-variant-numeric:tabular-nums}
+main{flex:1;display:flex;min-height:0}
+#stage{flex:1;position:relative;overflow:hidden;cursor:grab;touch-action:none;background-image:linear-gradient(var(--glow) 1px,transparent 1px),linear-gradient(90deg,var(--glow) 1px,transparent 1px);background-size:40px 40px}
+#world{position:absolute;left:0;top:0;width:0;height:0}
+aside{width:260px;border-left:1px solid var(--line);background:var(--panel);padding:10px;overflow:auto;font-size:12.5px}
+aside.off{display:none}
+aside h3{margin:12px 0 6px;font-size:11px;letter-spacing:.2em;color:var(--acc);text-transform:uppercase}
+aside h3:first-child{margin-top:0}
+.tag{display:inline-block;padding:1px 7px;margin:2px 3px 2px 0;border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--ink)}
+.tag.sh{border-color:var(--acc2);color:var(--acc2)}
+.wc{margin-bottom:8px;padding:6px;border:1px solid var(--line);border-radius:6px}
+.wc b{color:var(--acc)}
+.log{color:var(--mut);margin:3px 0}
+.win{position:absolute;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 0 18px var(--glow);backdrop-filter:blur(6px);resize:both;overflow:hidden;min-width:200px;min-height:140px}
+.win.target{border-color:var(--acc2);box-shadow:0 0 28px var(--acc2)}
+.win.drag{opacity:.85;box-shadow:0 8px 30px #0007}
+.win.flash{animation:fl .9s}
+@keyframes fl{0%{box-shadow:0 0 40px var(--acc2)}}
+.hd{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);cursor:grab;user-select:none;touch-action:none}
+.hd .t{flex:1;font-weight:600;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd .x{padding:0 7px;line-height:20px}
+.bd{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px;min-height:0}
+textarea,input{width:100%;font:inherit;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:6px;padding:6px;outline:none}
+textarea{flex:1;min-height:70px;resize:none}
+textarea:focus,input:focus{border-color:var(--acc)}
+.src{font-size:11px;color:var(--acc2)}
+.tags{min-height:20px}
+.task{display:flex;gap:6px;align-items:center}
+.task input{width:auto}
+.task.done span{text-decoration:line-through;color:var(--mut)}
+.msgs{display:flex;flex-direction:column;gap:5px;max-height:220px;overflow:auto}
+.m{padding:5px 8px;border-radius:6px;border:1px solid var(--line);max-width:92%;white-space:pre-wrap}
+.m.u{align-self:flex-end;color:var(--acc)}
+.m.a{align-self:flex-start}
+.hint{color:var(--mut);font-size:12px}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel);border:1px solid var(--acc2);color:var(--acc2);padding:8px 14px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;z-index:9999;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+@media (max-width:720px){aside{position:absolute;right:0;top:0;bottom:0;z-index:5000;width:min(280px,85vw)}}
+#world{transform-origin:0 0}.srl{display:flex;flex-direction:column;gap:6px}a.src{word-break:break-all}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" title="Multitasking Engine for Recall, Linking & Intelligent Navigation"><span class="orb"></span>M.E.R.L.I.N.</div>
+  <button data-add="note">+ Note</button>
+  <button data-add="tasks">+ Tasks</button>
+  <button data-add="chat">+ Assistant</button>
+  <button data-add="lab">+ R&D Lab</button>
+  <button data-add="search">+ Search</button>
+  <button id="tile">Tile</button>
+  <button id="home" title="Return to the origin">⌖ Center</button>
+  <button id="zo" title="Zoom out">−</button><button id="zr" title="Reset zoom">100%</button><button id="zi" title="Zoom in">+</button>
+  <button id="mic" hidden>🎙 Voice</button>
+  <button id="brain" title="Download and run an AI model on this device">🧠 Offline AI: off</button>
+  <button id="hf" title="Talk to Merlin continuously; replies are spoken">🎧 Hands-free: off</button>
+  <button id="spk">🔇 Speak: off</button>
+  <span class="sp"></span>
+  <span id="clock"></span>
+  <select id="origin" title="Where Merlin is from: accent, voice and personality"></select>
+  <button id="tg">Context</button>
+</header>
+<main>
+  <div id="stage"><div id="world"></div></div>
+  <aside id="ctx"></aside>
+</main>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s), stage=$('#stage'), world=$('#world'), ctx=$('#ctx'), toast=$('#toast');
+const STOP=new Set('this that with from have will your about there their which would could should what when where then than them they into been were also just like more some very only over such each make made does done need want here those these because while after before other being your you and the for are but not can all any our its was has had how why who'.split(' '));
+const S={wins:[],z:1,n:0,log:[],pan:{x:0,y:0},zoom:1};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const toks=s=>(String(s).toLowerCase().match(/[a-z0-9\u00c0-\u024f]{4,}/g)||[]).filter(w=>!STOP.has(w));
+const allText=w=>[w.text,(w.lab&&w.lab.out)||'',...w.tasks.map(t=>t.t),...w.chat.filter(m=>m.r==='u').map(m=>m.t)].join('\n');
+function kw(w,n=8){const f={};toks(allText(w)).forEach(t=>f[t]=(f[t]||0)+1);return Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,n).map(e=>e[0])}
+function say(m){toast.textContent=m;toast.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('on'),2600)}
+function newWin(type,o={}){
+  const i=++S.n, st=stage.getBoundingClientRect();
+  const w=Object.assign({id:i,type,title:{note:'Note',tasks:'Tasks',chat:'Assistant',lab:'R&D Lab',search:'Search'}[type]+' '+i,
+    x:(30+(i*34)%Math.max(60,st.width-380)-S.pan.x)/S.zoom,y:(20+(i*28)%Math.max(60,st.height-320)-S.pan.y)/S.zoom,w:320,h:280,z:++S.z,
+    text:'',tasks:[],chat:[],has:{note:type==='note',tasks:type==='tasks',chat:type==='chat',lab:type==='lab',search:type==='search'},sources:[],lab:{topic:'',mode:'brief',out:''},srch:{q:'',res:[],note:''}},o);
+  S.wins.push(w);return w;
+}
+function render(){
+  world.innerHTML='';
+  S.wins.forEach(w=>{
+    const e=document.createElement('div');e.className='win';e.id='w'+w.id;
+    Object.assign(e.style,{left:w.x+'px',top:w.y+'px',width:Math.min(w.w,stage.clientWidth-8)+'px',height:w.h+'px',zIndex:w.z});
+    e.innerHTML=`<div class="hd"><span class="t">${esc(w.title)}</span><button class="x" title="Close">×</button></div><div class="bd"></div>`;
+    const bd=e.querySelector('.bd');
+    if(w.sources.length)bd.insertAdjacentHTML('beforeend',`<div class="src">⛓ Merged from: ${esc(w.sources.join(', '))}</div>`);
+    bd.insertAdjacentHTML('beforeend','<div class="tags"></div>');
+    if(w.has.note){const t=document.createElement('textarea');t.placeholder='Type notes here… drag this window onto another to merge context.';t.value=w.text;
+      t.oninput=()=>{w.text=t.value;tags(w)};bd.append(t)}
+    if(w.has.tasks){const box=document.createElement('div');
+      const draw=()=>{box.innerHTML='';w.tasks.forEach((k,ix)=>{const r=document.createElement('label');r.className='task'+(k.d?' done':'');
+        r.innerHTML=`<input type="checkbox" ${k.d?'checked':''}><span>${esc(k.t)}</span>`;
+        r.querySelector('input').onchange=ev=>{k.d=ev.target.checked;draw()};box.append(r)});
+        const a=document.createElement('input');a.placeholder='Add task + Enter';
+        a.onkeydown=ev=>{if(ev.key==='Enter'&&a.value.trim()){w.tasks.push({t:a.value.trim(),d:false});draw();tags(w);box.querySelector('input[placeholder]').focus()}};box.append(a)};
+      draw();bd.append(box)}
+    if(w.has.chat){const m=document.createElement('div');m.className='msgs';
+      const draw=()=>{m.innerHTML=w.chat.length?w.chat.map(x=>`<div class="m ${x.r}">${esc(x.t)}</div>`).join(''):'<div class="hint">Ask me anything about the context in this window. Merge other windows in to give me more to work with.</div>';m.scrollTop=1e9};
+      const a=document.createElement('input');a.placeholder='Ask anything, or say “merge X into Y”, “open note”, “tile”…';
+      a.onkeydown=ev=>{if(ev.key==='Enter'&&a.value.trim()){const q=a.value.trim();a.value='';sendChat(w,q)}};
+      w._draw=draw;draw();bd.append(m,a)}
+    if(w.has.lab){const L=w.lab=w.lab||{topic:'',mode:'brief',out:''};
+      const ti=document.createElement('input');ti.placeholder='Research topic (blank = use this window\u2019s context)';ti.value=L.topic;ti.oninput=()=>{L.topic=ti.value};
+      const sel=document.createElement('select');sel.innerHTML=Object.entries(LAB).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');sel.value=L.mode;sel.onchange=()=>{L.mode=sel.value};
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;flex-wrap:wrap';
+      const run=document.createElement('button');run.textContent='\u25b6 Run R&D';
+      const tk=document.createElement('button');tk.textContent='\u2192 Tasks';
+      const nt=document.createElement('button');nt.textContent='\u2192 Note';
+      const out=document.createElement('div');out.className='m a';out.style.maxWidth='100%';out.style.userSelect='text';
+      out.textContent=L.out||'Merge notes or tasks into this window to give me context, pick a mode and run. I use Claude\u2019s own knowledge plus your context. I can\u2019t browse the live web, so verify anything important.';
+      row.append(sel,run,tk,nt);
+      run.onclick=()=>runLab(w,out,run);
+      tk.onclick=()=>labTasks(w,tk);
+      nt.onclick=()=>{if(!L.out)return;w.has.note=true;w.text+=(w.text?'\n\n':'')+'['+LAB[L.mode].n+'] '+L.out;S.log.unshift('Lab output saved to note');render()};
+      bd.append(ti,row,out)}
+    if(w.has.search){const Q=w.srch=w.srch||{q:'',res:[],note:''};
+      const ip=document.createElement('input');ip.placeholder='Search the web (runs in your browser, no Claude)…';ip.value=Q.q;
+      const nt=document.createElement('div');nt.className='hint';
+      const lst=document.createElement('div');lst.className='srl';
+      const draw=()=>{nt.textContent=Q.note||'Sources: your own search server (if set), Wikipedia, saved results, then your workspace notes.';
+        lst.innerHTML=Q.res.map(r=>`<div class="wc"><b>${esc(r.t)}</b><br>${esc(r.s)}${/^https?:/.test(r.u||'')?`<br><a class="src" href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.u.slice(0,70))}</a>`:''}</div>`).join('')};
+      const go=async()=>{Q.q=ip.value.trim();if(!Q.q)return;nt.textContent='Searching…';await webSearch(w,Q.q);draw()};
+      ip.onkeydown=ev=>{if(ev.key==='Enter')go()};
+      const set=document.createElement('button');set.textContent='⚙ My search server';
+      set.onclick=()=>{try{const u=prompt('URL of your own SearXNG server, e.g. http://localhost:8080 (blank = off)',localStorage.getItem('merlin:searx')||'');if(u!==null)localStorage.setItem('merlin:searx',u.trim())}catch(e){say('Settings unavailable here')}};
+      const gg=document.createElement('button');gg.textContent='🔍 Open in Google';gg.onclick=()=>window.open('https://www.google.com/search?q='+encodeURIComponent(ip.value||Q.q),'_blank');
+      w._go=go;draw();bd.append(ip,nt,lst,gg,set)}
+    e.addEventListener('pointerdown',()=>{w.z=++S.z;e.style.zIndex=w.z});
+    e.querySelector('.x').onclick=()=>{S.wins=S.wins.filter(z=>z!==w);S.log.unshift('Closed '+w.title);render()};
+    drag(e,w);
+    new ResizeObserver(()=>{if(e.offsetWidth){w.w=e.offsetWidth;w.h=e.offsetHeight}}).observe(e);
+    world.append(e);tags(w,true);
+  });
+  side();
+}
+function tags(w,skip){const e=$('#w'+w.id+' .tags');if(e)e.innerHTML=kw(w).map(k=>`<span class="tag">${esc(k)}</span>`).join('')||'<span class="hint">No context learned yet</span>';if(!skip)side()}
+function side(){
+  const cnt={};S.wins.forEach(w=>new Set(kw(w,12)).forEach(k=>cnt[k]=(cnt[k]||0)+1));
+  const shared=Object.keys(cnt).filter(k=>cnt[k]>1);
+  ctx.innerHTML=`<h3>Shared concepts</h3>${shared.map(k=>`<span class="tag sh">${esc(k)}</span>`).join('')||'<div class="hint">Nothing shared yet. Merge or write related windows to see links.</div>'}
+  <h3>Windows (${S.wins.length})</h3>${S.wins.map(w=>`<div class="wc"><b>${esc(w.title)}</b><br>${kw(w,6).map(k=>`<span class="tag">${esc(k)}</span>`).join('')}</div>`).join('')}
+  <h3>Activity</h3>${S.log.slice(0,8).map(l=>`<div class="log">› ${esc(l)}</div>`).join('')||'<div class="hint">Drag a window’s title bar over another and release to merge.</div>'}`+sessHTML();
+}
+function reply(w,q){
+  const qs=new Set(toks(q));
+  const sents=allText(w).split(/[\n.!?]+/).map(s=>s.trim()).filter(s=>s.length>3);
+  const sc=sents.map(s=>[toks(s).filter(t=>qs.has(t)).length,s]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,3);
+  const from=w.sources.length?` (context from ${w.sources.length+1} windows)`:'';
+  if(!sc.length)return`I don’t have anything on that in this window yet${from}. Try merging a related note or task list into me.`;
+  return`Here’s what I know${from}:\n`+sc.map(x=>'• '+x[1]).join('\n')+`\nKey themes: ${kw(w,4).join(', ')}.`;
+}
+function merge(srcW,dstW){
+  const before=new Set(kw(dstW,30));
+  if(srcW.text)dstW.text+=(dstW.text?'\n\n':'')+'['+srcW.title+'] '+srcW.text;
+  dstW.tasks.push(...srcW.tasks);dstW.chat.push(...srcW.chat);
+  if(srcW.srch&&srcW.srch.res.length){dstW.text+=(dstW.text?'\n\n':'')+'['+srcW.title+' search: '+srcW.srch.q+'] '+srcW.srch.res.map(r=>r.t+': '+r.s).join(' ');dstW.has.note=true}
+  if(srcW.lab&&srcW.lab.out){dstW.text+=(dstW.text?'\n\n':'')+'['+srcW.title+' R&D] '+srcW.lab.out;dstW.has.note=true}
+  for(const k in srcW.has)dstW.has[k]=dstW.has[k]||srcW.has[k];
+  dstW.sources.push(srcW.title,...srcW.sources);
+  dstW.title=(dstW.title.split(' + ')[0])+' + '+srcW.title.split(' + ')[0];
+  const gained=kw(dstW,30).filter(k=>!before.has(k));
+  S.wins=S.wins.filter(z=>z!==srcW);
+  S.log.unshift(`Merged ${srcW.title} → ${dstW.title}`);
+  render();const e=$('#w'+dstW.id);e.classList.add('flash');
+  say(gained.length?`Merged. Learned ${gained.length} new concept${gained.length>1?'s':''}: ${gained.slice(0,4).join(', ')}`:'Merged. Context combined.');
+}
+function drag(e,w){
+  const h=e.querySelector('.hd');let ox,oy,tgt=null,on=false;
+  h.onpointerdown=ev=>{if(ev.target.closest('.x'))return;on=true;ox=(ev.clientX-S.pan.x)/S.zoom-w.x;oy=(ev.clientY-S.pan.y)/S.zoom-w.y;h.setPointerCapture(ev.pointerId);e.classList.add('drag');h.style.cursor='grabbing'};
+  h.onpointermove=ev=>{if(!on)return;
+    const st=stage.getBoundingClientRect();
+    w.x=(ev.clientX-S.pan.x)/S.zoom-ox;w.y=(ev.clientY-S.pan.y)/S.zoom-oy;
+    e.style.left=w.x+'px';e.style.top=w.y+'px';
+    const hit=document.elementsFromPoint(ev.clientX,ev.clientY).find(n=>n.classList&&n.classList.contains('win')&&n!==e);
+    if(tgt&&tgt!==hit)tgt.classList.remove('target');
+    tgt=hit||null;if(tgt)tgt.classList.add('target')};
+  h.onpointerup=()=>{if(!on)return;on=false;e.classList.remove('drag');h.style.cursor='';
+    if(tgt){const d=S.wins.find(z=>'w'+z.id===tgt.id);tgt.classList.remove('target');tgt=null;if(d)merge(w,d)}};
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const w=newWin(b.dataset.add);S.log.unshift('Opened '+w.title);render()});
+$('#tile').onclick=()=>{const n=S.wins.length;if(!n)return;S.zoom=1;S.pan={x:0,y:0};applyPan();const W=stage.clientWidth,H=stage.clientHeight,c=Math.ceil(Math.sqrt(n)),r=Math.ceil(n/c);
+  S.wins.forEach((w,i)=>{w.w=W/c-12;w.h=H/r-12;w.x=(i%c)*(W/c)+6;w.y=Math.floor(i/c)*(H/r)+6});render()};
+$('#tg').onclick=()=>ctx.classList.toggle('off');
+function applyPan(){world.style.transform=`translate(${S.pan.x}px,${S.pan.y}px) scale(${S.zoom})`;stage.style.backgroundPosition=`${S.pan.x}px ${S.pan.y}px`;stage.style.backgroundSize=`${40*S.zoom}px ${40*S.zoom}px`;$('#zr').textContent=Math.round(S.zoom*100)+'%'}
+function zoomAt(f,cx,cy){const r=stage.getBoundingClientRect(),px=(cx==null?r.left+r.width/2:cx)-r.left,py=(cy==null?r.top+r.height/2:cy)-r.top,nz=Math.min(2.5,Math.max(.3,S.zoom*f)),k=nz/S.zoom;S.pan.x=px-(px-S.pan.x)*k;S.pan.y=py-(py-S.pan.y)*k;S.zoom=nz;applyPan()}
+const pts=new Map();let pn=null,pd=0;
+stage.onpointerdown=ev=>{if(ev.target!==stage&&ev.target!==world)return;pts.set(ev.pointerId,[ev.clientX,ev.clientY]);stage.setPointerCapture(ev.pointerId);
+  if(pts.size===2){pn=null;const[a,b]=[...pts.values()];pd=Math.hypot(a[0]-b[0],a[1]-b[1])}else{pn={x:ev.clientX-S.pan.x,y:ev.clientY-S.pan.y};stage.style.cursor='grabbing'}};
+stage.onpointermove=ev=>{if(pts.has(ev.pointerId))pts.set(ev.pointerId,[ev.clientX,ev.clientY]);
+  if(pts.size===2){const[a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)zoomAt(d/pd,(a[0]+b[0])/2,(a[1]+b[1])/2);pd=d;return}
+  if(!pn)return;S.pan.x=ev.clientX-pn.x;S.pan.y=ev.clientY-pn.y;applyPan()};
+stage.onpointerup=stage.onpointercancel=ev=>{pts.delete(ev.pointerId);pn=null;pd=0;stage.style.cursor=''};
+stage.onwheel=ev=>{if(ev.ctrlKey||ev.metaKey){ev.preventDefault();zoomAt(Math.exp(-ev.deltaY*.01),ev.clientX,ev.clientY);return}
+  if(ev.target!==stage&&ev.target!==world)return;ev.preventDefault();S.pan.x-=ev.deltaX;S.pan.y-=ev.deltaY;applyPan()};
+$('#zi').onclick=()=>zoomAt(1.25);$('#zo').onclick=()=>zoomAt(.8);$('#zr').onclick=$('#home').onclick=()=>{S.zoom=1;S.pan={x:0,y:0};applyPan()};
+applyPan();
+if(innerWidth<721)ctx.classList.add('off');
+setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString(),1000);$('#clock').textContent=new Date().toLocaleTimeString();
+function seed(){
+newWin('note',{title:'Project Atlas',x:20,y:20,text:'Atlas launch is planned for March. The marketing budget needs approval from finance. Customers asked for offline mode and faster onboarding.'});
+newWin('tasks',{title:'Launch Tasks',x:360,y:40,tasks:[{t:'Get finance approval for marketing budget',d:false},{t:'Prototype offline mode',d:false},{t:'Redesign onboarding flow',d:true}]});
+newWin('chat',{title:'Assistant',x:200,y:250});
+S.log.unshift('System online. Drag one window onto another to merge their context.');
+render();}
+const PERS={
+ ai:{n:'Natural assistant',lang:'en-US',hi:'Hey, I’m Merlin. What do you need?',acks:['Sure.','Got it.','On it.','Done.'],style:'a modern, warm AI assistant: natural, conversational and concise, like talking to a smart friend, with no butler formality and no caricature'},
+ gb:{n:'British · London',lang:'en-GB',hi:'Good day. M.E.R.L.I.N. at your service.',acks:['Very good, sir.','Right away.','Certainly.'],style:'a refined London butler in the spirit of the original J.A.R.V.I.S.: dry wit, understated, impeccably polite, British spelling, an occasional "sir"'},
+ sc:{n:'Scottish · Edinburgh',lang:'en-GB',hi:'Aye, good day. Merlin here, ready when ye are.',acks:['Aye, done.','Nae bother.','Consider it done.'],style:'a friendly Scot from Edinburgh: light touches like "aye", "wee", "nae bother"'},
+ au:{n:'Australian · Sydney',lang:'en-AU',hi:'G’day! Merlin online, no worries.',acks:['No worries.','Sorted.','She’ll be right.'],style:'a laid-back Australian: friendly, light slang like "no worries", "mate", "reckon"'},
+ us:{n:'American · Deep South',lang:'en-US',hi:'Well howdy! Merlin’s ready to help.',acks:['Sure thing.','Yes sir, right on it.','Much obliged.'],style:'a warm Southern American: gracious hospitality, light "y’all", "sure thing", "much obliged"'},
+ in:{n:'Indian · Mumbai',lang:'en-IN',hi:'Namaste! Merlin is ready. Kindly tell me what to do.',acks:['Done, no problem.','Kindly consider it done.','Right away.'],style:'a warm Indian English speaker: courteous, gentle cadence, phrases like "kindly" and "no problem"'},
+ id:{n:'Indonesian · Nusantara',lang:'id-ID',hi:'Selamat datang! Merlin siap membantu.',acks:['Siap!','Baik, beres.','Oke, segera.'],style:'warmly Indonesian-flavoured English: friendly, occasionally weaving in Bahasa words like "siap", "baik", "sama-sama"'}
+};
+let origin=(()=>{try{return localStorage.getItem('merlin:origin')}catch(e){return null}})();if(!PERS[origin])origin='ai';
+const ack=()=>{const a=PERS[origin].acks;return a[Math.floor(Math.random()*a.length)]};
+const flav=c=>/^(I couldn|Try:|Windows:|No windows)/.test(c)?c:ack()+' '+c;
+let speakOn=false;
+function speak(t){try{speechSynthesis.cancel();if(hfOn&&hf)try{hf.stop()}catch(e){}
+  const P=Object.assign({},PERS[origin]);if(/^id/.test(P.lang))P.lang='en-US';const v=pickVoice(speechSynthesis.getVoices(),P);
+  String(t).slice(0,700).split(/(?<=[.!?:;])\s+|\n+/).filter(s=>s.trim()).forEach(s=>{const u=new SpeechSynthesisUtterance(s);u.lang=P.lang;if(v)u.voice=v;u.pitch=V.pitch;u.rate=V.rate;speechSynthesis.speak(u)})}catch(e){}}
+const og=$('#origin');og.innerHTML=Object.keys(PERS).map(k=>`<option value="${k}">${PERS[k].n}</option>`).join('');og.value=origin;
+og.onchange=()=>{origin=og.value;try{localStorage.setItem('merlin:origin',origin)}catch(e){}const h=PERS[origin].hi;say(h);if(speakOn)speak(h)};
+setTimeout(()=>say(PERS[origin].hi+(PF.name?' Welcome back, '+PF.name+'.':'')),700);
+$('#spk').onclick=()=>{speakOn=!speakOn;$('#spk').textContent=speakOn?'🔊 Speak: on':'🔇 Speak: off';if(!speakOn)try{speechSynthesis.cancel()}catch(e){}};
+const TY={note:'note',notes:'note',task:'tasks',tasks:'tasks','task list':'tasks',assistant:'chat',chat:'chat',lab:'lab',search:'search'};
+function findWin(q){q=q.trim().replace(/^(the|my)\s+/,'');return S.wins.find(w=>w.title.toLowerCase()===q)||S.wins.find(w=>w.title.toLowerCase().includes(q)||q.includes(w.title.toLowerCase()))||S.wins.filter(w=>w.has[TY[q.replace(/ window$/,'')]]).sort((a,b)=>b.z-a.z)[0]}
+function tryCommand(text){
+  const t=text.toLowerCase().replace(/[.!?]+$/,'').trim().replace(/^(?:hey |ok |okay )?(?:jarvis|merlin)[, ]*/,'');let m;
+  if(/^merge (?:this|these|the top)(?: window)?(?: (?:into|with|and|to) (?:that|the other|the next|this)(?: window)?)?$/.test(t)){const o=[...S.wins].sort((a,b)=>b.z-a.z);
+    if(o.length<2)return'I need two windows to merge.';const a=o[0],b=o[1];merge(a,b);return'Done. Merged the top window into the one beneath it.'}
+  if(m=t.match(/^merge (.+?) (?:into|with|to|and) (.+)$/)){const a=findWin(m[1]),b=findWin(m[2]);
+    if(a&&b&&a!==b){merge(a,b);return`Done. Merged ${a.title.split(' + ')[0]} into ${b.title.split(' + ')[0]}.`}
+    return'I couldn’t find both windows. Current windows: '+S.wins.map(w=>w.title).join(', ')+'.'}
+  if(m=t.match(/^(?:open|new|create|add)(?: a| an)? (note|notes|task|tasks|task list|assistant|chat|lab|r&d lab|r and d lab|research lab)(?: window)?$/)){
+    const k=m[1];const type=k.startsWith('note')?'note':k.startsWith('task')?'tasks':/lab/.test(k)?'lab':'chat';const w=newWin(type);S.log.unshift('Opened '+w.title);render();return'Opened '+w.title+'.'}
+  if(/^tile\b/.test(t)){$('#tile').click();return'Windows tiled.'}
+  if(m=t.match(/^close (.+)$/)){const w=findWin(m[1]);if(w){S.wins=S.wins.filter(z=>z!==w);S.log.unshift('Closed '+w.title);render();return'Closed '+w.title+'.'}return'I couldn’t find that window.'}
+  if(/^(save|snapshot)\b/.test(t)){snap();return'Session saved.'}
+  if(m=t.match(/^(?:use |switch to |change to )?(?:the )?(old man|old|deep|young|normal|default) voice$/)){setPreset(/old/.test(m[1])?'old':/normal|default/.test(m[1])?'default':m[1]);return'Voice changed to '+(m[1]==='normal'?'default':m[1])+'.'}
+  if(/^(?:speak |talk )?(?:slower|slow down)$/.test(t)){V.rate=Math.max(.5,+(V.rate-.15).toFixed(2));saveV();side();return'Speaking slower.'}
+  if(/^(?:speak |talk )?(?:faster|speed up)$/.test(t)){V.rate=Math.min(1.5,+(V.rate+.15).toFixed(2));saveV();side();return'Speaking faster.'}
+  if(/^(?:lower|deeper) (?:your )?voice$/.test(t)){V.pitch=Math.max(.3,+(V.pitch-.2).toFixed(2));saveV();side();return'Voice lowered.'}
+  if(/^(?:higher|raise) (?:your )?voice$/.test(t)){V.pitch=Math.min(1.8,+(V.pitch+.2).toFixed(2));saveV();side();return'Voice raised.'}
+  if(m=t.match(/^(?:call me|my name is) (.+)$/)){PF.name=m[1].replace(/\b\w/g,c=>c.toUpperCase());savePF();side();return'Nice to meet you, '+PF.name+'. I\u2019ll remember that.'}
+  if(/^(?:forget everything|clear (?:my )?memory|forget me)$/.test(t)){PF={name:'',len:'',facts:[],topics:{},auto:PF.auto};savePF();side();return'Memory cleared.'}
+  if(m=t.match(/^forget (?:that )?(.+)$/)){const i=PF.facts.findIndex(f=>f.t.toLowerCase().includes(m[1]));if(i>=0){const x=PF.facts.splice(i,1)[0];savePF();side();return'Forgot: '+x.t+'.'}return'I don\u2019t have that in memory.'}
+  if(/^(?:what do you know about me|what have you learned(?: about me)?|who am i)/.test(t)){const b=[];if(PF.name)b.push('your name is '+PF.name);PF.facts.forEach(f=>b.push(f.t));const tt=topTopics(5);if(tt.length)b.push('you often talk about '+tt.join(', '));return b.length?'Here is what I know: '+b.join('; ')+'.':'Not much yet. Tell me about yourself and I will remember.'}
+  if(/^(?:stop learning|pause learning|don.t learn)/.test(t)){PF.auto=false;savePF();side();return'Auto-learning paused. I will only remember what you tell me to.'}
+  if(/^(?:start learning|resume learning)/.test(t)){PF.auto=true;savePF();side();return'Auto-learning is on.'}
+  if(/^(?:be |keep (?:it|answers|replies) )?(?:short|shorter|brief|concise)$/.test(t)){PF.len='short';savePF();side();return'Understood, I will keep things short.'}
+  if(/^(?:be |give )?(?:more detail|detailed|longer|elaborate)$/.test(t)){PF.len='detailed';savePF();side();return'Understood, I will go into more detail.'}
+  if(/^(?:remember|learn)(?: that)? /.test(t)){learn(stripName(text).replace(/^(?:remember|learn)(?: that)? /i,''));return'I will remember that.'}
+  if(/^i (?:prefer|like|love|hate|dislike|work (?:on|at|as|in|for)|am working on|am an?|live in|study|speak) /.test(t)){learn(stripName(text));return'Noted. I will remember that.'}
+  if(m=t.match(/^(?:google|search google for|search on google(?: for)?|open google(?: for| and search(?: for)?)?) (.+)$/)){
+    const p=window.open('https://www.google.com/search?q='+encodeURIComponent(m[1]),'_blank');if(p){try{p.opener=null}catch(e){}return'Opening Google for '+m[1]+'.'}
+    return'Your browser blocked the popup. Use the Google button in the Search window.'}
+  if(m=t.match(/^(?:search|look up|web search)(?: the web| online)?(?: for| about)? (.+)$/)){
+    let w=S.wins.filter(x=>x.has.search).sort((a,b)=>b.z-a.z)[0];if(!w)w=newWin('search');w.has.search=true;w.srch=w.srch||{q:'',res:[],note:''};w.srch.q=m[1];render();setTimeout(()=>w._go&&w._go(),60);return'Searching for '+m[1]+'.'}
+  if(m=t.match(/^(?:research|investigate|run (?:r&d|r and d)(?: on)?|do (?:r&d|r and d) on) (.+)$/)){
+    let w=S.wins.filter(x=>x.has.lab).sort((a,b)=>b.z-a.z)[0];if(!w)w=newWin('lab');w.has.lab=true;w.lab=w.lab||{topic:'',mode:'brief',out:''};w.lab.topic=m[1];render();
+    setTimeout(()=>{const e=$('#w'+w.id),b=e&&[...e.querySelectorAll('button')].find(x=>x.textContent.includes('Run'));if(b)b.click()},60);return'Starting R&D on '+m[1]+'.'}
+  if((m=t.match(/^(?:add|new|create) (?:a )?task(?: to)?:? (.+)$/))||(m=t.match(/^remind me to (.+)$/))){
+    let w=S.wins.filter(x=>x.has.tasks).sort((a,b)=>b.z-a.z)[0];if(!w)w=newWin('tasks');
+    w.has.tasks=true;w.tasks.push({t:m[1].charAt(0).toUpperCase()+m[1].slice(1),d:false});S.log.unshift('Task added to '+w.title);render();return'Added a task to '+w.title+': '+m[1]+'.'}
+  if(m=t.match(/^(?:write|note|jot down|take a note)(?: that| down)?:? (.+)$/)){
+    let w=S.wins.filter(x=>x.has.note).sort((a,b)=>b.z-a.z)[0];if(!w)w=newWin('note');
+    w.has.note=true;w.text+=(w.text?'\n':'')+m[1].charAt(0).toUpperCase()+m[1].slice(1)+'.';S.log.unshift('Wrote in '+w.title);render();return'Noted in '+w.title+'.'}
+  if(m=t.match(/^(?:go to|goto|focus|jump to) (.+)$/)){const w=findWin(m[1]);
+    if(w){S.pan.x=stage.clientWidth/2-(w.x+w.w/2)*S.zoom;S.pan.y=stage.clientHeight/2-(w.y+w.h/2)*S.zoom;applyPan();w.z=++S.z;
+      const e=$('#w'+w.id);if(e){e.style.zIndex=w.z;e.classList.add('flash');setTimeout(()=>e.classList.remove('flash'),900)}return'Showing '+w.title+'.'}
+    return'I couldn’t find that window.'}
+  if(m=t.match(/^(?:pan|move|scroll)(?: the view)? (left|right|up|down)/)){const d={left:[300,0],right:[-300,0],up:[0,300],down:[0,-300]}[m[1]];S.pan.x+=d[0];S.pan.y+=d[1];applyPan();return'Panned '+m[1]+'.'}
+  if(m=t.match(/^zoom (in|out)/)){zoomAt(m[1]==='in'?1.25:.8);return'Zoomed '+m[1]+'.'}
+  if(/^(?:center|centre|go home|reset view|recenter)/.test(t)){S.zoom=1;S.pan={x:0,y:0};applyPan();return'View centered.'}
+  if(/^(?:list|what are)(?: my| the)? windows/.test(t))return S.wins.length?'Windows: '+S.wins.map(w=>w.title).join(', ')+'.':'No windows open.';
+  if(/^(?:speak|talk to me|read aloud|voice on)/.test(t)){if(!speakOn)$('#spk').click();return'Voice replies on.'}
+  if(/^(?:mute|be quiet|stop speaking|voice off|silence)/.test(t)){if(speakOn)$('#spk').click();return'Voice replies off.'}
+  if(/^(?:help|what can you do|commands)/.test(t))return'Try: add task…, write…, go to [window], merge A into B, open note/tasks/assistant/lab, research [topic], pan left, center, tile, close [window], save session, speak, mute.';
+  return null;
+}
+async function sendChat(w,q){
+  const c=tryCommand(q);
+  w.chat.push({r:'u',t:q});
+  if(c!==null){const f=flav(c);w.chat.push({r:'a',t:f});w._draw&&w._draw();if(speakOn)speak(f);return}
+  noteTopics(q);const m={r:'a',t:'Thinking…'};w.chat.push(m);w._draw&&w._draw();tags(w);
+  const prompt='You are M.E.R.L.I.N. (Multitasking Engine for Recall, Linking & Intelligent Navigation), a concise, capable workspace assistant with the personality of '+styleOf()+'. Keep the accent light, readable and respectful, never a caricature, and always reply in English. Use the workspace context below, which comes from windows the user merged together, and mention which part you used when helpful. If the context does not cover the question, say so briefly and answer from general knowledge. Keep replies plain text, short by default unless the user prefers detail.\n\n'+profText()+'WINDOW: '+w.title+'\nMERGED FROM: '+(w.sources.join(', ')||'none')+'\nNOTES:\n'+(w.text||'(none)')+'\nTASKS:\n'+(w.tasks.map(k=>'- ['+(k.d?'x':' ')+'] '+k.t).join('\n')||'(none)')+'\nRECENT CHAT:\n'+w.chat.slice(-8,-2).map(x=>(x.r==='u'?'User: ':'Assistant: ')+x.t).join('\n')+'\n\nUSER: '+q;
+  try{
+    const up=t=>{m.t=t;w._draw&&w._draw()},tries=[];
+    if(aiReady())tries.push(()=>aiAsk(prompt,up));
+    if(!indep&&typeof claude!=='undefined')tries.push(async()=>{const s=await claude.use('sample');if(!s)throw{code:'none'};const r=await s(prompt,{cache:false,onText:({text})=>up(text)});return r.text});
+    if(LM)tries.push(()=>localAsk(prompt,up));
+    let got='',err=null;for(const f of tries){try{got=await f();if(got)break}catch(e){err=e}}
+    if(!got)throw err||{code:'none'};m.t=got;
+  }catch(e){m.t=reply(w,q)+(e&&e.code==='not_granted'?'\n(AI access was declined, so I used local mode.)':e&&e.code==='none'?'':'\n(AI unavailable right now'+(e&&e.message?': '+String(e.message).slice(0,90):'')+'. Used local mode.)')}
+  w._draw&&w._draw();side();if(speakOn)speak(m.t);PF.n=(PF.n||0)+1;if(PF.auto!==false&&PF.n%4===0)autoLearn(w);
+}
+async function runCommand(text){
+  const c=tryCommand(text);if(c!==null){const f=flav(c);say(f);if(speakOn)speak(f);return}
+  let w=S.wins.filter(x=>x.has.chat).sort((a,b)=>b.z-a.z)[0];
+  if(!w){w=newWin('chat');render()}
+  sendChat(w,text);
+}
+const LAB={
+ brief:{n:'Research brief',p:'Write a research brief: problem framing, what is already known, 3 key open questions, and recommended next steps.'},
+ hyp:{n:'Hypotheses',p:'Propose 4 testable hypotheses, each with a rationale, a way to test it, and the expected signal.'},
+ exp:{n:'Experiment plan',p:'Design a lean experiment plan: goal, method, metrics, resources, a step-by-step timeline, and risks.'},
+ scan:{n:'Landscape scan',p:'Give a landscape scan: main approaches, notable players or prior art, trade-offs, and gaps worth exploiting.'},
+ crit:{n:'Red team',p:'Critique the idea or plan: weakest assumptions, failure modes, missing evidence, and how to de-risk each.'}
+};
+async function runLab(w,out,btn){
+  const L=w.lab,topic=(L.topic||'').trim()||kw(w,6).join(', ');
+  if(!topic){out.textContent='Give me a topic, or merge some notes or tasks into this window first.';return}
+  const prompt='You are the R&D engine of M.E.R.L.I.N., speaking as '+styleOf()+' (keep any accent very light). Task: '+LAB[L.mode].p+' Be concrete and compact: plain text, short numbered points, about 300 words at most. You cannot browse the internet, so rely on your own knowledge, flag anything the user should verify, and never invent citations or URLs.\n\n'+profText()+'TOPIC: '+topic+'\nWORKSPACE CONTEXT (merged from: '+(w.sources.join(', ')||'nothing')+'):\nNOTES:\n'+(w.text||'(none)')+'\nTASKS:\n'+(w.tasks.map(k=>'- ['+(k.d?'x':' ')+'] '+k.t).join('\n')||'(none)');
+  btn.disabled=true;out.textContent='Thinking\u2026';
+  try{
+    const sample=(typeof claude!=='undefined')?await claude.use('sample'):null;if(!sample)throw{code:'none'};
+    const r=await sample(prompt,{cache:false,onText:({text})=>{out.textContent=text}});
+    L.out=r.text||'';out.textContent=L.out;S.log.unshift('R&D '+LAB[L.mode].n+': '+topic.slice(0,40));tags(w);
+    if(speakOn)speak(L.out.slice(0,300));
+  }catch(e){out.textContent=(e&&e.text)||(e&&e.code==='not_granted'?'AI access was declined, so the lab can\u2019t run.':e&&e.code==='none'?'The lab needs Claude access, which isn\u2019t available here.':'The lab hit a snag. Try again in a moment.')}
+  finally{btn.disabled=false}
+}
+async function labTasks(w,btn){
+  if(!w.lab||!w.lab.out){say('Run the lab first');return}
+  btn.disabled=true;
+  try{
+    const sample=(typeof claude!=='undefined')?await claude.use('sample'):null;if(!sample)throw 0;
+    const a=await sample.json('Reply with only a JSON array of up to 6 short action items (strings) taken from this R&D output:\n\n'+w.lab.out,{modelTier:'quick'});
+    const items=(Array.isArray(a)?a:[]).map(String).filter(Boolean).slice(0,6);
+    if(!items.length){say('No action items found');return}
+    w.has.tasks=true;items.forEach(t=>w.tasks.push({t,d:false}));S.log.unshift('Lab added '+items.length+' tasks');render();say('Added '+items.length+' tasks');
+  }catch(e){say('Could not extract tasks right now')}
+  finally{btn.disabled=false}
+}
+// independence: optional on-device AI brain (WebLLM), and a switch that never calls Claude
+const SYS='You are Merlin, a warm, quick, capable AI assistant, like a personal Jarvis. Talk the way a smart friend would: natural, direct, conversational, no robotic phrases and no stiff formality. Usually answer in 1 to 4 sentences, longer only when asked. Never refuse to chat. If you are unsure, say so briefly and still give your best answer.';
+let LM=null,indep=(()=>{try{return localStorage.getItem('merlin:indep')==='1'}catch(e){return false}})();
+async function loadBrain(){if(!navigator.gpu){$('#brain').textContent='🧠 Offline AI: unsupported';say('This browser has no WebGPU, so the offline AI cannot run here. Use Chrome or Edge on a recent computer.');return}
+  $('#brain').textContent='🧠 Loading…';say('Loading the local AI… the first time it downloads about 1 GB');
+  try{const wl=await import('https://esm.run/@mlc-ai/web-llm'),ml=wl.prebuiltAppConfig.model_list.map(x=>x.model_id),
+    id=ml.find(x=>/Qwen2\.5-1\.5B-Instruct-q4f16/.test(x))||ml.find(x=>/(0\.5B|1B).*q4f16/.test(x))||ml[0];
+    LM=await wl.CreateMLCEngine(id,{initProgressCallback:p=>{say(String(p.text).slice(0,90));$('#brain').textContent='🧠 '+Math.round((p.progress||0)*100)+'%'}});try{localStorage.setItem('merlin:brain','1')}catch(e){}$('#brain').textContent='🧠 Offline AI: ready';say('Offline AI ready. Merlin now thinks on this device.');side()}
+  catch(e){LM=null;$('#brain').textContent='🧠 Offline AI: off';say('Offline AI could not start: '+String(e&&e.message||e).slice(0,100))}}
+async function localAsk(prompt,onText){const r=await LM.chat.completions.create({messages:[{role:'system',content:SYS},{role:'user',content:prompt}],stream:true,max_tokens:320});let t='';for await(const c of r){t+=(c.choices[0]&&c.choices[0].delta&&c.choices[0].delta.content)||'';onText(t)}return t}
+let GK=(()=>{try{return JSON.parse(localStorage.getItem('merlin:gem'))||{}}catch(e){return{}}})();
+const saveGK=()=>{try{localStorage.setItem('merlin:gem',JSON.stringify(GK))}catch(e){}};
+const PROV={
+ gemini:{n:'Google Gemini (free tier)',url:'https://generativelanguage.googleapis.com/v1beta',model:'gemini-flash-latest',kind:'gemini'},
+ groq:{n:'Groq (fast, free tier)',url:'https://api.groq.com/openai/v1',model:'llama-3.3-70b-versatile',kind:'oai'},
+ openrouter:{n:'OpenRouter (hundreds of models, some free)',url:'https://openrouter.ai/api/v1',model:'meta-llama/llama-3.3-70b-instruct:free',kind:'oai'},
+ deepseek:{n:'DeepSeek (very cheap)',url:'https://api.deepseek.com/v1',model:'deepseek-chat',kind:'oai'},
+ mistral:{n:'Mistral',url:'https://api.mistral.ai/v1',model:'mistral-small-latest',kind:'oai'},
+ together:{n:'Together AI',url:'https://api.together.xyz/v1',model:'meta-llama/Llama-3.3-70B-Instruct-Turbo',kind:'oai'},
+ openai:{n:'OpenAI (ChatGPT)',url:'https://api.openai.com/v1',model:'gpt-4o-mini',kind:'oai'},
+ anthropic:{n:'Anthropic (Claude API)',url:'https://api.anthropic.com/v1',model:'claude-haiku-5-5',kind:'anth'},
+ ollama:{n:'Ollama on this computer (free, offline)',url:'http://localhost:11434/v1',model:'llama3.2',kind:'oai',nokey:true},
+ lmstudio:{n:'LM Studio on this computer (free, offline)',url:'http://localhost:1234/v1',model:'local-model',kind:'oai',nokey:true},
+ custom:{n:'Custom (any OpenAI-compatible API)',url:'',model:'',kind:'oai'}
+};
+let AI=(()=>{try{const a=JSON.parse(localStorage.getItem('merlin:ai'));if(a&&a.c)return a}catch(e){}return GK.key?{p:'gemini',c:{gemini:{key:GK.key,model:GK.model||''}}}:{p:'',c:{}}})();
+const saveAI=()=>{try{localStorage.setItem('merlin:ai',JSON.stringify(AI))}catch(e){}};
+const aiCfg=()=>{const p=PROV[AI.p];if(!p)return null;const c=Object.assign({},AI.c[AI.p]);return{p,url:(c.url||p.url||'').replace(/\/$/,''),key:c.key||'',model:c.model||p.model}};
+const aiReady=()=>{const c=aiCfg();return !!(c&&c.url&&c.model&&(c.key||c.p.nokey))};
+async function aiAsk(prompt,onText){
+  const c=aiCfg();let r,j,out;
+  if(c.p.kind==='gemini'){r=await fetch(c.url+'/models/'+encodeURIComponent(c.model)+':generateContent?key='+encodeURIComponent(c.key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:SYS}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:500}})});
+    j=await r.json();const k=((j.candidates||[])[0]||{}).content;out=k&&k.parts?k.parts.map(x=>x.text||'').join(''):''}
+  else if(c.p.kind==='anth'){r=await fetch(c.url+'/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':c.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:c.model,max_tokens:500,system:SYS,messages:[{role:'user',content:prompt}]})});
+    j=await r.json();out=(j.content||[]).map(x=>x.text||'').join('')}
+  else{const h={'Content-Type':'application/json'};if(c.key)h.Authorization='Bearer '+c.key;
+    r=await fetch(c.url+'/chat/completions',{method:'POST',headers:h,body:JSON.stringify({model:c.model,max_tokens:500,messages:[{role:'system',content:SYS},{role:'user',content:prompt}]})});
+    j=await r.json();out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content}
+  if(!r.ok){const e=j&&j.error;throw new Error(String((e&&(e.message||e))||('HTTP '+r.status)))}
+  if(!out)throw new Error('empty reply');onText(out);return out}
+const aiFields=()=>{const p=PROV[AI.p],c=AI.c[AI.p]||{};
+  return`<label class="hint">AI provider<select id="aip" style="width:100%;max-width:100%"><option value="">None (built-in only)</option>${Object.entries(PROV).map(([k,v])=>`<option value="${k}"${AI.p===k?' selected':''}>${esc(v.n)}</option>`).join('')}</select></label>`+(p?`<label class="hint">Base URL<input id="aiurl" value="${esc(c.url||'')}" placeholder="${esc(p.url||'https://…/v1')}"></label>${p.nokey?'':`<label class="hint">API key<input id="aikey" type="password" value="${esc(c.key||'')}" placeholder="paste key"></label>`}<label class="hint">Model<input id="aimodel" value="${esc(c.model||'')}" placeholder="${esc(p.model||'model name')}"></label><button data-act="aitest">Test connection</button>`:'')};
+const indepHTML=()=>`<h3>Independence</h3>${aiFields()}<label class="hint"><input type="checkbox" id="indep" style="width:auto"${indep?' checked':''}> Independent mode (never call Claude)</label><button data-act="brain">${LM?'✓ Local brain ready':'⬇ Download local AI brain'}</button><div class="hint">The local brain runs on this device with no server. It needs WebGPU and a one-time download, and it is smaller and less capable than Claude. Without it, Merlin answers from your notes.</div>`;
+// local web search: runs in this browser, no Claude, and never breaks if blocked
+const sj=(u,ms=6000)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).then(r=>{if(!r.ok)throw 0;return r.json()}).finally(()=>clearTimeout(t))};
+const clean=s=>String(s||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+const getC=()=>{try{return JSON.parse(localStorage.getItem('merlin:sc'))||{}}catch(e){return{}}};
+async function webSearch(w,q){
+  const Q=w.srch,k=q.toLowerCase();let res=[],src='';
+  let sx='';try{sx=(localStorage.getItem('merlin:searx')||'').replace(/\/$/,'')}catch(e){}
+  if(sx){try{const j=await sj(sx+'/search?format=json&q='+encodeURIComponent(q));res=(j.results||[]).slice(0,8).map(r=>({t:clean(r.title),s:clean(r.content).slice(0,240),u:r.url}));src='your own search server'}catch(e){}}
+  if(!res.length){try{const lg=PERS[origin].lang.slice(0,2),j=await sj('https://'+lg+'.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=6&prop=extracts|info&exintro=1&explaintext=1&exlimit=max&exsentences=2&inprop=url&format=json&origin=*');
+    res=Object.values((j.query||{}).pages||{}).sort((a,b)=>a.index-b.index).map(p=>({t:p.title,s:clean(p.extract).slice(0,240),u:p.fullurl}));src='Wikipedia'}catch(e){}}
+  if(res.length){const c=getC();c[k]=res;const ks=Object.keys(c);if(ks.length>40)delete c[ks[0]];try{localStorage.setItem('merlin:sc',JSON.stringify(c))}catch(e){}}
+  else{const c=getC();if(c[k]){res=c[k];src='saved results (offline)'}}
+  if(!res.length){const qs=new Set(toks(q));
+    S.wins.filter(x=>x!==w).forEach(x=>allText(x).split(/[\n.!?]+/).map(s=>s.trim()).filter(s=>s.length>3).forEach(s=>{const n=toks(s).filter(t=>qs.has(t)).length;if(n)res.push({n,t:x.title,s,u:''})}));
+    res=res.sort((a,b)=>b.n-a.n).slice(0,5);src='your workspace notes (offline mode)'}
+  Q.res=res;Q.note=res.length?'Results from '+src+'.':'No results, and no search source is reachable right now.';
+  S.log.unshift('Search: '+q.slice(0,40)+' ('+(res.length?src:'no results')+')');side();if(speakOn&&res.length)speak(res[0].t+'. '+res[0].s.slice(0,200))}
+// voice
+const PRE={merlin:{pitch:.96,rate:.97,tone:.15},default:{pitch:1,rate:.97},old:{pitch:.5,rate:.76},deep:{pitch:.7,rate:.9},young:{pitch:1.4,rate:1.08}};
+let V=(()=>{const d={preset:'merlin',name:'',pitch:.96,rate:.97,tone:.15};try{return Object.assign(d,JSON.parse(localStorage.getItem('merlin:voice'))||{})}catch(e){return d}})();
+const saveV=()=>{try{localStorage.setItem('merlin:voice',JSON.stringify(V))}catch(e){}};
+const GOOD=/natural|premium|enhanced|online|neural|google uk english male/i;
+const MALE=/\b(male|david|daniel|fred|alex|george|james|mark|thomas|oliver|rishi|aaron|arthur|gordon|ravi|guy|ryan)\b/i;
+function pickVoice(vs,P){
+  if(V.name){const m=vs.find(x=>x.name===V.name);if(m)return m}
+  const l2=P.lang.slice(0,2).toLowerCase(),pool=vs.filter(x=>x.lang.toLowerCase().startsWith(l2)),exact=pool.filter(x=>x.lang.replace('_','-').toLowerCase()===P.lang.toLowerCase()),base=exact.length?exact:(pool.length?pool:vs);
+  if(V.preset==='old'||V.preset==='deep'||V.preset==='merlin'){const mv=base.find(x=>MALE.test(x.name)&&GOOD.test(x.name))||base.find(x=>MALE.test(x.name))||pool.find(x=>MALE.test(x.name))||vs.find(x=>MALE.test(x.name));if(mv)return mv}
+  return base[0]||null}
+function setPreset(k,test){V.preset=k;V.name='';Object.assign(V,PRE[k]||PRE.default);saveV();if(k!=='default'&&!speakOn)$('#spk').click();side();if(test)speak(k==='old'?'Well now, how do I sound, my boy?':'Hello, this is my new voice.')}
+const styleOf=()=>PERS[origin].style+(V.preset==='old'?'; also speak like a wise, gentle old man: unhurried, warm, with an occasional "well now", while keeping answers clear':'');
+function voiceHTML(){let vs=[];try{vs=speechSynthesis.getVoices()}catch(e){}
+  const pre=[['merlin','Merlin · Man, 35'],['default','Standard'],['old','Old man'],['deep','Deep'],['young','Young']];
+  return`<h3>Merlin’s voice</h3><div>${pre.map(([k,n])=>`<button data-act="vp" data-k="${k}"${V.preset===k?' style="border-color:var(--acc2);color:var(--acc2)"':''}>${n}</button>`).join(' ')}</div><label class="hint">Voice<select id="vsel" style="width:100%;max-width:100%"><option value="">Auto (best match)</option>${vs.map(v=>`<option value="${esc(v.name)}"${V.name===v.name?' selected':''}>${esc(v.name)} (${esc(v.lang)})</option>`).join('')}</select></label>${V.preset==='merlin'?`<label class="hint">Tone: mild ↔ heavy <input id="vtone" type="range" min="0" max="1" step="0.05" value="${V.tone}"></label>`:''}<label class="hint">Pitch <input id="vpit" type="range" min="0.3" max="1.8" step="0.05" value="${V.pitch}"></label><label class="hint">Speed <input id="vrate" type="range" min="0.5" max="1.5" step="0.05" value="${V.rate}"></label><button data-act="vtest">▶ Test voice</button><div class="hint">Voices come from your device, so what’s on offer varies. Pitch is ignored by some voices.</div>`}
+ctx.oninput=ev=>{const id=ev.target.id;if(id==='vtone'){V.tone=+ev.target.value;V.preset='merlin';V.pitch=+(1-.25*V.tone).toFixed(2);V.rate=+(.98-.1*V.tone).toFixed(2);saveV()}else if(id==='vpit'){V.pitch=+ev.target.value;V.preset='custom';saveV()}else if(id==='vrate'){V.rate=+ev.target.value;V.preset='custom';saveV()}};
+ctx.onchange=ev=>{if(ev.target.id==='aip'){AI.p=ev.target.value;saveAI();side();return}if(AI.p&&/^ai(url|key|model)$/.test(ev.target.id)){const c=AI.c[AI.p]=AI.c[AI.p]||{};c[ev.target.id.slice(2)]=ev.target.value.trim();saveAI();say('Saved on this device');return}if(ev.target.id==='indep'){indep=ev.target.checked;try{localStorage.setItem('merlin:indep',indep?'1':'0')}catch(e){}say(indep?'Independent mode on. Claude is not used.':'Independent mode off.');return}if(ev.target.id==='vsel'){V.name=ev.target.value;saveV();speak('Voice selected.')}};
+try{speechSynthesis.onvoiceschanged=()=>side()}catch(e){}
+// learning about the user
+let PF=(()=>{const d={name:'',len:'',facts:[],topics:{},auto:true};try{return Object.assign(d,JSON.parse(localStorage.getItem('merlin:profile'))||{})}catch(e){return d}})();
+const savePF=()=>{try{localStorage.setItem('merlin:profile',JSON.stringify(PF))}catch(e){}};
+const stripName=s=>String(s).trim().replace(/^(?:hey |ok |okay )?(?:jarvis|merlin)[, ]*/i,'');
+function learn(f,quiet){f=String(f).trim().replace(/[.!?]+$/,'');if(f.length<4)return false;f=f.charAt(0).toUpperCase()+f.slice(1);
+  if(PF.facts.some(x=>x.t.toLowerCase()===f.toLowerCase()))return false;
+  PF.facts.push({t:f.slice(0,140),ts:Date.now()});PF.facts=PF.facts.slice(-30);savePF();if(!quiet)side();return true}
+function noteTopics(q){toks(q).forEach(k=>{PF.topics[k]=(PF.topics[k]||0)+1});const e=Object.entries(PF.topics);if(e.length>80)PF.topics=Object.fromEntries(e.sort((a,b)=>b[1]-a[1]).slice(0,50));savePF()}
+const topTopics=n=>Object.entries(PF.topics).filter(e=>e[1]>1).sort((a,b)=>b[1]-a[1]).slice(0,n).map(e=>e[0]);
+function profText(){const p=[];if(PF.name)p.push('Name: '+PF.name+' (use it now and then).');if(PF.len==='short')p.push('Prefers short, brief replies.');if(PF.len==='detailed')p.push('Prefers detailed, thorough replies.');
+  if(PF.facts.length)p.push('Known facts: '+PF.facts.slice(-15).map(f=>f.t).join('; ')+'.');const tt=topTopics(6);if(tt.length)p.push('Frequent interests: '+tt.join(', ')+'.');
+  return p.length?'ABOUT THE USER (learned over time; use as background and never recite it back unprompted):\n'+p.join('\n')+'\n\n':''}
+function memHTML(){const tt=topTopics(8);
+  return`<h3>What Merlin knows about you</h3>${PF.name?`<div class="wc"><b>Name</b> ${esc(PF.name)}</div>`:''}${PF.len?`<div class="wc"><b>Style</b> ${PF.len==='short'?'short replies':'detailed replies'}</div>`:''}${PF.facts.map((f,i)=>`<div class="log">• ${esc(f.t)} <button data-act="mforget" data-i="${i}" title="Forget">×</button></div>`).join('')||'<div class="hint">Nothing yet. Say “remember that I …” or “call me …”, or just chat and I will pick things up.</div>'}${tt.length?'<div>'+tt.map(k=>`<span class="tag">${esc(k)}</span>`).join('')+'</div>':''}<div class="hint">Auto-learning ${PF.auto===false?'off':'on'} · say “stop learning” or “start learning”</div>${(PF.name||PF.facts.length||tt.length)?'<button data-act="mwipe">Forget everything</button>':''}`}
+async function autoLearn(w){try{
+  const sample=(!indep&&typeof claude!=='undefined')?await claude.use('sample'):null;if(!sample)return;
+  const msgs=w.chat.filter(x=>x.r==='u').slice(-6).map(x=>'- '+x.t).join('\n');if(!msgs)return;
+  const a=await sample.json('Reply with only a JSON array (maximum 3) of short, durable facts or preferences about the USER (their name, job, projects, goals, tools, tastes, communication style) that are clearly stated in the messages below. Return [] when there is nothing durable. Never include one-off questions or guesses.\n\nMESSAGES:\n'+msgs,{modelTier:'quick'});
+  const got=(Array.isArray(a)?a:[]).map(String).filter(f=>learn(f,true));
+  if(got.length){side();say('Learned about you: '+got.slice(0,2).join('; '))}
+}catch(e){}}
+// sessions
+const ser=()=>JSON.stringify({wins:S.wins,z:S.z,n:S.n,pan:S.pan,zoom:S.zoom,log:S.log.slice(0,20)},(k,v)=>k[0]==='_'?undefined:v);
+function save(){try{localStorage.setItem('jarvis:auto',ser())}catch(e){}}
+function apply(d){S.wins=d.wins;S.z=d.z||S.wins.length+1;S.n=d.n||S.wins.length;S.log=d.log||[];S.pan=d.pan||{x:0,y:0};S.zoom=d.zoom||1;applyPan()}
+function load(){try{const d=JSON.parse(localStorage.getItem('jarvis:auto'));if(d&&d.wins&&d.wins.length){apply(d);render();return true}}catch(e){}return false}
+const snaps=()=>{try{return JSON.parse(localStorage.getItem('jarvis:snaps'))||[]}catch(e){return[]}};
+const putSnaps=a=>{try{localStorage.setItem('jarvis:snaps',JSON.stringify(a))}catch(e){say('Could not save: storage unavailable')}};
+function snap(){const a=snaps();a.unshift({name:'Session '+(a.length+1)+' · '+new Date().toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}),data:JSON.parse(ser())});putSnaps(a.slice(0,10));S.log.unshift('Saved a session snapshot');side()}
+function sessHTML(){const a=snaps();return memHTML()+voiceHTML()+indepHTML()+`<h3>Voice orders</h3><div class="hint">“add task …”, “write …”, “go to [window]”, “merge A into B”, “open note / tasks / assistant / lab”, “research [topic]”, “search [topic]”, “google [topic]”, “merge this with that”, “zoom in” / “zoom out”, “remember that …”, “call me …”, “forget …”, “what do you know about me”, “pan left”, “old man voice” / “deep voice” / “normal voice”, “speak slower”, “center”, “tile”, “close [window]”, “save session”, “speak” / “mute”. Anything else is a question for the assistant. Start with “Merlin” if you like.</div><h3>Saved sessions</h3><button data-act="snap">+ Save session</button>${a.map((x,i)=>`<div class="wc">${esc(x.name)}<br><button data-act="load" data-i="${i}">Load</button> <button data-act="del" data-i="${i}">Delete</button></div>`).join('')||'<div class="hint">No snapshots yet. Your current workspace also auto-saves.</div>'}`}
+ctx.onclick=ev=>{const b=ev.target.closest('[data-act]');if(!b)return;const i=+b.dataset.i,a=snaps();
+  if(b.dataset.act==='aitest'){if(!aiReady()){say('Fill in the key and model first');return}say('Testing…');aiAsk('Say hello in five words.',()=>{}).then(t=>say('Works: '+t.slice(0,80))).catch(e=>say('Failed: '+String(e.message||e).slice(0,110)));return}
+  if(b.dataset.act==='brain'){if(!LM)loadBrain();return}
+  if(b.dataset.act==='vp'){setPreset(b.dataset.k,true);return}
+  if(b.dataset.act==='vtest'){speak(V.preset==='old'?'Well now, this is how I sound.':'Hello, this is how I sound.');return}
+  if(b.dataset.act==='mforget'){PF.facts.splice(i,1);savePF();side();return}
+  if(b.dataset.act==='mwipe'){PF={name:'',len:'',facts:[],topics:{},auto:PF.auto};savePF();side();say('Memory cleared');return}
+  if(b.dataset.act==='snap')snap();
+  else if(b.dataset.act==='load'&&a[i]){apply(JSON.parse(JSON.stringify(a[i].data)));S.log.unshift('Loaded '+a[i].name);render();say('Session loaded')}
+  else if(b.dataset.act==='del'){a.splice(i,1);putSnaps(a);side()}};
+setInterval(save,3000);addEventListener('pagehide',save);
+if(!load())seed();
+// voice input
+function fallbackVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  const mic=$('#mic');mic.hidden=false;const r=new SR();r.lang=navigator.language||'en-US';r.interimResults=true;r.continuous=false;let live=false;
+  r.onstart=()=>{live=true;mic.textContent='🔴 Listening…'};r.onend=()=>{live=false;mic.textContent='🎙 Voice'};
+  r.onerror=()=>say('Microphone not available');
+  r.onresult=e=>{const x=e.results[e.results.length-1],t=x[0].transcript;if(x.isFinal){say('Heard: '+t);runCommand(t.trim())}else say('… '+t)};
+  mic.onclick=()=>{live?r.stop():r.start()}}
+(async()=>{try{
+  if(typeof claude==='undefined'){fallbackVoice();return}
+  const d=await claude.use('dictation');if(!d){fallbackVoice();return}
+  const mic=$('#mic');mic.hidden=false;let live=false;
+  mic.onclick=()=>{live?d.stop():d.start().catch(()=>say('Microphone not available'))};
+  d.onState(({state})=>{live=state==='listening';mic.textContent=live?'🔴 Listening…':'🎙 Voice'});
+  d.onPartial(({text})=>say('… '+text));
+  d.onFinal(({text})=>{if(text&&text.trim()){say('Heard: '+text);runCommand(text.trim())}});
+}catch(e){}})();
+// hands-free conversation: always listening, replies are spoken
+let hf=null,hfOn=false;
+function handsFree(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition,b=$('#hf');
+  if(!SR){say('Speech recognition isn’t supported in this browser. Try Chrome or Edge.');return}
+  hfOn=!hfOn;b.textContent=hfOn?'🎧 Hands-free: on':'🎧 Hands-free: off';
+  if(!hfOn){try{hf.stop()}catch(e){}return}
+  if(!speakOn)$('#spk').click();
+  hf=new SR();hf.lang=navigator.language||'en-US';hf.continuous=true;hf.interimResults=false;
+  hf.onresult=e=>{const x=e.results[e.results.length-1];if(!x.isFinal)return;const t=x[0].transcript.trim();if(!t||speechSynthesis.speaking)return;say('Heard: '+t);runCommand(t)};
+  hf.onend=()=>{if(!hfOn)return;const again=()=>{if(speechSynthesis.speaking||speechSynthesis.pending)setTimeout(again,400);else try{hf.start()}catch(e){}};setTimeout(again,300)};
+  hf.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){hfOn=false;b.textContent='🎧 Hands-free: off';say('Microphone blocked. Allow it for this page.')}};
+  try{hf.start()}catch(e){}say('Listening. Just talk to me.')}
+$('#hf').onclick=handsFree;$('#brain').onclick=()=>{if(!LM)loadBrain()};
+try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+try{if(localStorage.getItem('merlin:brain')==='1')loadBrain()}catch(e){}
+</script>
+</body>
+</html>
